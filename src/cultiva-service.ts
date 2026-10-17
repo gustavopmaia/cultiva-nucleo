@@ -110,7 +110,7 @@ export class CultivaService {
         l.at.getTime() >= limit &&
         l.at.getTime() <= reading.at.getTime(),
     );
-    const fontes = ["iot", "vehicle", "satellite"];
+    const fontes = Object.keys(STRATEGIES) as Reading["source"][];
     let sum = 0;
     let weights = 0;
     const averages: number[] = [];
@@ -118,10 +118,7 @@ export class CultivaService {
       const fromSource = recent.filter((l) => l.source === source);
       if (fromSource.length === 0) continue;
       const average = fromSource.reduce((s, l) => s + l.score, 0) / fromSource.length;
-      let weight = 0;
-      if (source === "iot") weight = 0.5;
-      if (source === "vehicle") weight = 0.35;
-      if (source === "satellite") weight = 0.15;
+      const weight = STRATEGIES[source].weight;
       sum += average * weight;
       weights += weight;
       averages.push(average);
