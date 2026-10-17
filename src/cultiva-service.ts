@@ -35,6 +35,51 @@ export interface WorkOrder {
   completedAt: Date | null;
 }
 
+export interface ScoreStrategy {
+  weight: number;
+  calculate(reading: Reading): number;
+}
+
+const clamp = (score: number) => Math.min(100, Math.max(0, score));
+
+const iotScore: ScoreStrategy = {
+  weight: 0.5,
+  calculate(reading) {
+    if (reading.source !== "iot") throw new Error("reading is not iot");
+    if (reading.heightCm < 0) throw new Error("invalid height");
+    return clamp(reading.heightCm * 1.4);
+  },
+};
+
+const VEHICLE_BASE = { ok: 10, attention: 50, urgent: 85 };
+
+const vehicleScore: ScoreStrategy = {
+  weight: 0.35,
+  calculate(reading) {
+    if (reading.source !== "vehicle") throw new Error("reading is not vehicle");
+    const confidence = reading.confidence > 1 ? reading.confidence / 100 : reading.confidence;
+    if (confidence < 0 || confidence > 1) throw new Error("invalid confidence");
+    return clamp(VEHICLE_BASE[reading.condition] * confidence);
+  },
+};
+
+const satelliteScore: ScoreStrategy = {
+  weight: 0.15,
+  calculate(reading) {
+    if (reading.source !== "satellite") throw new Error("reading is not satellite");
+    if (reading.ndvi < -1 || reading.ndvi > 1) throw new Error("invalid ndvi");
+    return clamp((reading.ndvi - 0.2) * 200);
+  },
+};
+
+const STRATEGIES: Record<Reading["source"], ScoreStrategy> = {
+  iot: iotScore,
+  vehicle: vehicleScore,
+  satellite: satelliteScore,
+};
+
+const calcularScore = (reading: Reading) => STRATEGIES[reading.source].calculate(reading);
+
 export class CultivaService {
   segments: RoadSegment[] = [];
   teams: Team[] = [];
@@ -54,25 +99,7 @@ export class CultivaService {
     const segment = this.segments.find((t) => t.id === segmentId);
     if (!segment) throw new Error("segment not found");
 
-    let score = 0;
-    if (reading.source === "iot") {
-      if (reading.heightCm < 0) throw new Error("invalid height");
-      score = reading.heightCm * 1.4;
-    } else if (reading.source === "vehicle") {
-      let base = 0;
-      if (reading.condition === "ok") base = 10;
-      else if (reading.condition === "attention") base = 50;
-      else if (reading.condition === "urgent") base = 85;
-      let confidence = reading.confidence;
-      if (confidence > 1) confidence = confidence / 100;
-      if (confidence < 0 || confidence > 1) throw new Error("invalid confidence");
-      score = base * confidence;
-    } else if (reading.source === "satellite") {
-      if (reading.ndvi < -1 || reading.ndvi > 1) throw new Error("invalid ndvi");
-      score = (reading.ndvi - 0.2) * 200;
-    }
-    if (score < 0) score = 0;
-    if (score > 100) score = 100;
+    const score = calcularScore(reading);
     this.readings.push({ segmentId, source: reading.source, score, at: reading.at });
 
     // fuse readings from the last 24h
