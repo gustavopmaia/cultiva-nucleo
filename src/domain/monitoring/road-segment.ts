@@ -1,6 +1,6 @@
 import { Alert } from "./alert.js";
 import { STRATEGIES } from "./score-strategies.js";
-import { KmRange } from "./km-range.js";
+import { KmRange } from "../shared/km-range.js";
 import type { Source, Reading } from "./reading.js";
 import { Score } from "./score.js";
 
