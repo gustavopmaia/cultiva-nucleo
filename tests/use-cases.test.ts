@@ -49,3 +49,23 @@ describe("record reading use case with fake adapters", () => {
     expect(world.workOrders.map((o) => o.status)).toEqual(["completed", "open"]);
   });
 });
+
+describe("input validation", () => {
+  it("rejects a segment whose km range is inverted", () => {
+    const world = new World();
+
+    expect(() => world.registerSegment("S1", "SP-300", 20, 10)).toThrow("invalid km range");
+  });
+
+  it("rejects completing a work order that does not exist", () => {
+    const world = new World();
+
+    expect(() => world.completeWorkOrder(7, at(8))).toThrow("work order not found");
+  });
+
+  it("rejects starting a work order that does not exist", () => {
+    const world = new World();
+
+    expect(() => world.startWorkOrder(7)).toThrow("work order not found");
+  });
+});
