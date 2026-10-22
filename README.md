@@ -1,6 +1,6 @@
 # Cultiva - núcleo do MVP
 
-![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/gustavopmaia/cultiva-nucleo/actions/workflows/ci.yml/badge.svg)
 
 Núcleo do Cultiva (checkpoint 1: monitoramento de vegetação em rodovias). Leituras de
 sensor IoT, câmera de veículo e satélite são fundidas num score por trecho. Quando o score
