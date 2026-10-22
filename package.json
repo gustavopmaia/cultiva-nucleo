@@ -11,7 +11,8 @@
     "cobertura": "vitest run --coverage",
     "lint": "eslint . && prettier --check . && tsc --noEmit",
     "formatar": "prettier --write .",
-    "demo": "tsx src/cli.ts"
+    "demo": "tsx src/adapters/cli.ts",
+    "coupling": "tsx scripts/coupling.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
