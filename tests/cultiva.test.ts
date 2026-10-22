@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { CultivaService } from "../src/cultiva-service.js";
+import { World } from "./support/world.js";
 
 const hour = (h: number) => new Date(Date.UTC(2026, 9, 20, h, 0, 0));
 
 describe("score per source", () => {
-  let service: CultivaService;
+  let service: World;
 
   beforeEach(() => {
-    service = new CultivaService();
+    service = new World();
     service.registerSegment("T1", "SP-300", 10, 20);
   });
 
@@ -90,10 +90,10 @@ describe("score per source", () => {
 });
 
 describe("source fusion", () => {
-  let service: CultivaService;
+  let service: World;
 
   beforeEach(() => {
-    service = new CultivaService();
+    service = new World();
     service.registerSegment("T1", "SP-300", 10, 20);
   });
 
@@ -168,10 +168,10 @@ describe("source fusion", () => {
 });
 
 describe("alerts and work orders", () => {
-  let service: CultivaService;
+  let service: World;
 
   beforeEach(() => {
-    service = new CultivaService();
+    service = new World();
     service.registerSegment("T1", "SP-300", 10, 20);
   });
 
@@ -220,10 +220,10 @@ describe("alerts and work orders", () => {
 });
 
 describe("dispatch", () => {
-  let service: CultivaService;
+  let service: World;
 
   beforeEach(() => {
-    service = new CultivaService();
+    service = new World();
     service.registerTeam("North", 0, 30);
     service.registerTeam("South", 31, 60);
   });
@@ -273,10 +273,10 @@ describe("dispatch", () => {
 });
 
 describe("work order lifecycle", () => {
-  let service: CultivaService;
+  let service: World;
 
   beforeEach(() => {
-    service = new CultivaService();
+    service = new World();
     service.registerSegment("T1", "SP-300", 10, 20);
     service.recordReading("T1", { source: "iot", heightCm: 70, at: hour(8) });
   });
